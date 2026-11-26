@@ -739,13 +739,12 @@
             },
             {
               time: '12:00 – 13:30',
-              title: "午餐：Pizza 4P's 披薩",
+              title: "午餐：Pizza 4P’s Le Thanh Ton",
               mustGo: true,
-              reserved: true,
-              editableAddressKey: 'pizza4ps',
+              reservedTime: '13:15',
               transport: { label: '🚶 步行 / Grab', color: 'bg-coconut/30' },
               hours: '10:30 / 11:00–22:00',
-              mapQuery: "Pizza 4P's Ho Chi Minh",
+              address: 'Hẻm 8/15 Lê Thánh Tôn, Sài Gòn, Hồ Chí Minh 700000越南',
               note: '參觀完地標後，直接步行或搭車前往預訂好的 Pizza 4P’s 享用招牌布拉塔起司披薩。',
               icon: 'pizza'
             },
@@ -789,9 +788,9 @@
             },
             {
               time: '19:30 之後',
-              title: '晚餐：胖媽廚房 (Madam Cuc Saigon)',
+              title: '晚餐：胖媽廚房 Bếp Mẹ Ỉn (Madam Cuc Saigon)',
               mustGo: true,
-              reserved: true,
+              reservedTime: '19:45',
               transport: { label: '🚕 Grab 叫車', color: 'bg-mango/45' },
               hours: '10:00–22:00',
               address: '136/9 Lê Thánh Tôn, Bến Thành, Hồ Chí Minh, 越南',
@@ -1227,8 +1226,8 @@
                             : ''
                         }
                         ${
-                          item.reserved
-                            ? '<span class="px-2.5 py-0.5 rounded-full bg-coconut text-white border border-coffee/20 text-xs font-bold tracking-wide">✓ 已訂位</span>'
+                          item.reservedTime || item.reserved
+                            ? `<span class="px-2.5 py-0.5 rounded-full bg-coconut text-white border border-coffee/20 text-xs font-bold tracking-wide">✓ 已訂位${item.reservedTime ? ' ' + item.reservedTime : ''}</span>`
                             : ''
                         }
                         <span class="px-2.5 py-0.5 rounded-full ${item.transport.color} border border-coffee/15 text-xs font-medium text-coffee">
@@ -1364,7 +1363,7 @@
           badgeColor: 'bg-mango',
           icon: '📝',
           items: [
-            { id: 't1', text: "線上預約 Day 2 午餐：Pizza 4P's 披薩", checked: false },
+            { id: 't1', text: "線上預約 Day 2 午餐：Pizza 4P’s Le Thanh Ton (13:15)", checked: true },
             { id: 't2', text: '預約 Day 1 越式洗髮 & Day 3 全身按摩時段', checked: false },
             { id: 't3', text: '下載 Grab App 並完成台灣信用卡綁定與簡訊驗證', checked: false },
             { id: 't4', text: '購買越南網卡 / eSIM 並確認開通方式', checked: false },
