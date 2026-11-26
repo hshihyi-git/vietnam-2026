@@ -223,6 +223,7 @@
         <a href="#top" class="px-2.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-coffee hover:bg-mango/30 transition-colors whitespace-nowrap">首頁</a>
         <a href="#flights" class="px-2.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-coffee hover:bg-ocean/25 transition-colors whitespace-nowrap">航班</a>
         <a href="#itinerary" class="px-2.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-coffee hover:bg-dragonfruit/25 transition-colors whitespace-nowrap">每日行程</a>
+        <a href="#spa" class="px-2.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-coffee hover:bg-mango/35 transition-colors whitespace-nowrap">SPA 推薦</a>
         <a href="#checklists" class="px-2.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-coffee hover:bg-coconut/25 transition-colors whitespace-nowrap">住宿與清單</a>
       </div>
 
@@ -509,35 +510,44 @@
           role="tab"
           aria-selected="true"
           data-day="1"
-          class="day-tab btn-bounce py-2.5 px-2 rounded-xl font-display font-bold text-sm transition-all bg-mango text-coffee border border-coffee/25 shadow-sm"
+          class="day-tab btn-bounce py-2 px-2 rounded-xl font-display font-bold text-xs sm:text-sm transition-all bg-mango text-coffee border border-coffee/25 shadow-sm"
         >
           <span class="block text-xs opacity-80">12/04 週五</span>
-          <span class="text-base">Day 1 🌆</span>
+          <span class="text-sm sm:text-base">Day 1 🌆</span>
         </button>
         <button
           type="button"
           role="tab"
           aria-selected="false"
           data-day="2"
-          class="day-tab btn-bounce py-2.5 px-2 rounded-xl font-display font-bold text-sm transition-all text-coffee/75 hover:text-coffee border border-transparent"
+          class="day-tab btn-bounce py-2 px-2 rounded-xl font-display font-bold text-xs sm:text-sm transition-all text-coffee/75 hover:text-coffee border border-transparent"
         >
           <span class="block text-xs opacity-80">12/05 週六</span>
-          <span class="text-base">Day 2 ☀️</span>
+          <span class="text-sm sm:text-base">Day 2 ☀️</span>
         </button>
         <button
           type="button"
           role="tab"
           aria-selected="false"
           data-day="3"
-          class="day-tab btn-bounce py-2.5 px-2 rounded-xl font-display font-bold text-sm transition-all text-coffee/75 hover:text-coffee border border-transparent"
+          class="day-tab btn-bounce py-2 px-2 rounded-xl font-display font-bold text-xs sm:text-sm transition-all text-coffee/75 hover:text-coffee border border-transparent"
         >
           <span class="block text-xs opacity-80">12/06 週日</span>
-          <span class="text-base">Day 3 ☕</span>
+          <span class="text-sm sm:text-base">Day 3 ☕</span>
         </button>
       </div>
 
       <!-- 動態渲染的時間軸容器 -->
       <div id="timelineContainer" class="animate-tab-bounce"></div>
+    </section>
+
+    <!-- 3.5. SPA 推薦口袋名單區塊 -->
+    <section id="spa" class="scroll-mt-16 space-y-4">
+      <div>
+        <span class="text-xs font-bold tracking-wider text-dragonfruit uppercase">RELAX &amp; WELLNESS</span>
+        <h2 class="font-display font-black text-2xl text-coffee">SPA 推薦口袋名單</h2>
+      </div>
+      <div id="spaListContainer"></div>
     </section>
 
     <!-- 4. 住宿資訊與可打勾清單區 -->
@@ -660,721 +670,1055 @@
   ></div>
 
   <script>
-    // ==========================================
-    // 1. 行程資料庫 (完整還原使用者提供的三日行程)
-    // ==========================================
-    const ITINERARY_DATA = {
-      1: {
-        dayTitle: 'Day 1（週五）：抵達市區、人氣越式洗髮與米其林晚餐',
-        accentColor: 'bg-mango',
-        summary: '16:50 抵達新山一機場後搭乘 Grab 入城，以暖胃河粉與療癒洗髮開啟週末夜。',
-        items: [
-          {
-            time: '18:30 – 19:30',
-            title: '飯店 Check-in 與晚餐：米其林推薦越南河粉',
-            mustGo: true,
-            transport: { label: '🚕 Grab 叫車 / 步行', color: 'bg-mango/45' },
-            hours: '如 Phở Hòa Pasteur (06:00–00:00) 或 Pho Dậu (06:00–21:00)',
-            note: '抵達市區後馬上享用暖胃的道地河粉，清甜湯頭搭配新鮮香草與檸檬超開胃。',
-            icon: 'pho'
-          },
-          {
-            time: '19:30 – 21:00',
-            title: '越式洗髮體驗',
-            mustGo: true,
-            transport: { label: '🚶 步行 / Grab', color: 'bg-coconut/30' },
-            hours: '多數至 21:00 / 22:00',
-            note: '體驗肩頸紓壓、臉部清潔與草本水療洗髮，徹底洗去一週的工作與飛行疲勞。',
-            icon: 'spa'
-          },
-          {
-            time: '21:00 之後',
-            title: '特色咖啡：NHA BA TERIA',
-            mustGo: false,
-            transport: { label: '🚕 Grab / 步行', color: 'bg-ocean/30' },
-            hours: '深夜營業咖啡廳',
-            note: '享受深夜的特色咖啡與愜意時光，感受西貢越夜越迷人的慢步調。',
-            icon: 'coffee'
-          }
-        ]
-      },
-      2: {
-        dayTitle: 'Day 2（週六）：粉紅教堂、人氣 Pizza 午餐與市區漫步',
-        accentColor: 'bg-dragonfruit',
-        summary: '從晨光中的夢幻粉紅教堂出發，串聯法式殖民地標、咖啡公寓選物與在地美食！',
-        items: [
-          {
-            time: '09:00 – 10:30',
-            title: '粉紅教堂（耶穌聖心堂）',
-            mustGo: true,
-            transport: { label: '🚕 Grab 叫車', color: 'bg-mango/45' },
-            hours: '內部參觀通常 08:00–11:00（早晨光線最好）',
-            note: '把握早晨柔和順光拍出夢幻粉紅建築美照，建議穿著端莊得體。',
-            icon: 'church'
-          },
-          {
-            time: '10:30 – 12:00',
-            title: '西貢中心郵政局 → 書街',
-            mustGo: true,
-            transport: { label: '🚕 Grab → 🚶 步行', color: 'bg-coconut/30' },
-            hours: '郵政局 08:00–17:00｜書街 08:00–21:30',
-            note: '欣賞百年法式古典穹頂建築並寄張明信片，接著漫步綠蔭盎然的書街。',
-            icon: 'post'
-          },
-          {
-            time: '12:00 – 13:30',
-            title: "午餐：Pizza 4P's 披薩",
-            mustGo: true,
-            transport: { label: '🚶 步行 / Grab', color: 'bg-coconut/30' },
-            hours: '10:30 / 11:00–22:00',
-            note: '參觀完地標後，直接步行或搭車前往預訂好的 Pizza 4P’s 享用招牌布拉塔起司披薩。',
-            icon: 'pizza'
-          },
-          {
-            time: '13:30 – 15:00',
-            title: '咖啡公寓 → GARMENTORY 選物店',
-            mustGo: true,
-            transport: { label: '🚶 悠閒步行', color: 'bg-coconut/30' },
-            hours: '咖啡公寓 08:00–22:00｜GARMENTORY 約 10:00–20:00',
-            note: '探索一格格充滿驚喜的文青咖啡館與越南設計師質感選物店。',
-            icon: 'apartment'
-          },
-          {
-            time: '15:00 – 17:00',
-            title: '超市大掃貨：高露潔牙膏（哈利波特款）',
-            mustGo: false,
-            transport: { label: '🚶 步行 / Grab', color: 'bg-ocean/30' },
-            hours: '超市通常至 22:00',
-            note: '鎖定人氣限定版哈利波特聯名高露潔牙膏，順便採買腰果、咖啡與伴手禮！',
-            icon: 'bag'
-          },
-          {
-            time: '17:30 – 19:00',
-            title: '特色咖啡：DABAO CONCEPT 或 LINH COFFEE',
-            mustGo: false,
-            transport: { label: '🚕 Grab / 步行', color: 'bg-ocean/30' },
-            hours: '約 07:00–21:00 / 22:00',
-            note: '傍晚歇腳時刻，在充滿南洋庭院或復古懷舊氛圍的咖啡廳小憩片刻。',
-            icon: 'coffee'
-          },
-          {
-            time: '19:30 之後',
-            title: '晚餐：胖媽廚房 (Madam Cuc Saigon)',
-            mustGo: true,
-            transport: { label: '🚕 Grab 叫車', color: 'bg-mango/45' },
-            hours: '10:00–22:00',
-            note: '晚餐品嚐道地的越南家常菜，為充實的一天作結。',
-            icon: 'pho'
-          },
-          {
-            time: '宵夜',
-            title: 'Bánh Mì Huỳnh Hoa',
-            mustGo: true,
-            transport: { label: '🚕 Grab / 外帶回飯店', color: 'bg-dragonfruit/30' },
-            hours: '通常至 21:00 / 22:00（建議留意打烊時間提前購買）',
-            note: '買個份量十足、內餡超豐富的地表最強越式法國麵包回飯店當宵夜！',
-            icon: 'banhmi'
-          }
-        ]
-      },
-      3: {
-        dayTitle: 'Day 3（週日）：悠閒按摩與完美賦歸',
-        accentColor: 'bg-ocean',
-        summary: '睡到自然醒，用全身按摩與早午餐為假期畫下句點，14:30 準時出發前往機場。',
-        items: [
-          {
-            time: '10:00 – 11:30',
-            title: '全身按摩',
-            mustGo: true,
-            transport: { label: '🚶 步行 / Grab', color: 'bg-coconut/30' },
-            hours: 'SPA 館大多從 09:00 / 10:00 開始',
-            note: '週日早晨安排一場精油或熱石全身按摩，徹底放鬆身心。',
-            icon: 'spa'
-          },
-          {
-            time: '11:30 – 13:00',
-            title: '午餐與自由活動',
-            mustGo: false,
-            transport: { label: '🚶 悠閒步行', color: 'bg-coconut/30' },
-            hours: '',
-            note: '輕鬆享用早午餐或來杯最後的越式煉乳冰咖啡時光。',
-            icon: 'coffee'
-          },
-          {
-            time: '13:00 – 14:30',
-            title: '最後採購與整理行李',
-            mustGo: false,
-            transport: { label: '🚶 步行 / 飯店整理', color: 'bg-ocean/30' },
-            hours: '',
-            note: '檢查戰利品與牙膏是否妥善裝箱（注意液體/牙膏容量超過 100ml 需託運）。',
-            icon: 'bag'
-          },
-          {
-            time: '14:30',
-            title: '搭乘 Grab 前往新山一國際機場',
-            mustGo: true,
-            transport: { label: '🚕 Grab 叫車', color: 'bg-mango/45' },
-            hours: '車程約 30–45 分鐘（建議預留塞車與出境時間）',
-            note: '確認護照與隨身物品皆已帶齊，前往國際航廈辦理星宇航空報到。',
-            icon: 'car'
-          },
-          {
-            time: '18:00',
-            title: '搭機起飛，返回溫暖的家！',
-            mustGo: false,
-            transport: { label: '✈️ 星宇航空 JX714', color: 'bg-ocean/35' },
-            hours: '18:00 SGN 起飛 → 22:20 抵達 TPE',
-            note: '帶著滿滿的南洋陽光回憶與戰利品平安返台！',
-            icon: 'plane'
-          }
-        ]
-      }
-    };
+    (function () {
+      'use strict';
 
-    // 行程小插畫 SVG 圖示庫 (保持一致的 1.5px 咖啡棕手繪線條風格)
-    function getSpotSvg(type) {
-      const icons = {
-        pho: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 13h20c0 6-4.5 10-10 10S4 19 4 13z" fill="#F6C453"/>
-                <path d="M8 23h12" />
-                <path d="M9 9c0-2 1.5-2.5 1.5-4.5M14 9c0-2 1.5-2.5 1.5-4.5M19 9c0-2 1.5-2.5 1.5-4.5" />
-              </svg>`,
-        spa: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 6c3 4 4 8 0 13-4-5-3-9 0-13z" fill="#E97870"/>
-                <path d="M14 19c-5-1-8-4-8-8 4 0 7 3 8 8z" fill="#78A77B"/>
-                <path d="M14 19c5-1 8-4 8-8-4 0-7 3-8 8z" fill="#78A77B"/>
-                <path d="M7 22h14" />
-              </svg>`,
-        coffee: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 10h12l-1.5 12h-9L8 10z" fill="#55AFC5"/>
-                <path d="M9.2 18h9.6l-.5 4h-8.6l-.5-4z" fill="#FFF9F0"/>
-                <path d="M17 5l-3 9" stroke="#E97870" stroke-width="1.8"/>
-              </svg>`,
-        church: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="14,4 9,13 19,13" fill="#E97870"/>
-                <rect x="8" y="13" width="12" height="11" rx="1" fill="#E97870"/>
-                <path d="M12 24v-5a2 2 0 0 1 4 0v5" fill="#FFF9F0"/>
-                <path d="M14 2v2" />
-              </svg>`,
-        post: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="4" y="7" width="20" height="14" rx="2" fill="#F6C453"/>
-                <path d="M4 9l10 7 10-7" />
-              </svg>`,
-        pizza: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 5L5 21c6 2.5 12 2.5 18 0L14 5z" fill="#F6C453"/>
-                <circle cx="13" cy="14" r="1.5" fill="#E97870"/>
-                <circle cx="16.5" cy="18" r="1.5" fill="#E97870"/>
-              </svg>`,
-        apartment: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="6" y="4" width="16" height="20" rx="2" fill="#FFF9F0"/>
-                <rect x="9" y="7" width="4" height="4" fill="#F6C453"/>
-                <rect x="15" y="7" width="4" height="4" fill="#55AFC5"/>
-                <rect x="9" y="13" width="4" height="4" fill="#E97870"/>
-                <rect x="15" y="13" width="4" height="4" fill="#78A77B"/>
-              </svg>`,
-        bag: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M7 10h14l1 13H6L7 10z" fill="#78A77B"/>
-                <path d="M10 10V8a4 4 0 0 1 8 0v2" />
-              </svg>`,
-        banhmi: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="4" y="10" width="20" height="9" rx="4.5" transform="rotate(-15 14 14.5)" fill="#F6C453"/>
-                <path d="M9 13l3 2M13 11l3 2M17 10l2 2" stroke="#78A77B"/>
-              </svg>`,
-        car: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6 16l2-6h12l2 6v5H6v-5z" fill="#78A77B"/>
-                <circle cx="9.5" cy="21" r="2" fill="#FFF9F0"/>
-                <circle cx="18.5" cy="21" r="2" fill="#FFF9F0"/>
-              </svg>`,
-        plane: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 16l20-6-7 11-4-3-4 2v-4l-5 0z" fill="#55AFC5"/>
-              </svg>`
-      };
-      return icons[type] || icons.coffee;
-    }
-
-    // ==========================================
-    // 2. 渲染每日行程時間軸與日期切換彈跳效果
-    // ==========================================
-    const timelineContainer = document.getElementById('timelineContainer');
-    const dayTabs = document.querySelectorAll('.day-tab');
-
-    function renderDayItinerary(dayNum, animate = true) {
-      const data = ITINERARY_DATA[dayNum];
-      if (!data) return;
-
-      // 更新 Tab 樣式
-      dayTabs.forEach((btn) => {
-        const isSelected = btn.dataset.day === String(dayNum);
-        btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
-        if (isSelected) {
-          btn.className = 'day-tab btn-bounce py-2.5 px-2 rounded-xl font-display font-bold text-sm transition-all bg-mango text-coffee border border-coffee/25 shadow-sm';
-        } else {
-          btn.className = 'day-tab btn-bounce py-2.5 px-2 rounded-xl font-display font-bold text-sm transition-all text-coffee/75 hover:text-coffee border border-transparent';
+      // ==========================================
+      // 1. 行程資料庫 (完整還原使用者提供的三日行程)
+      // ==========================================
+      const ITINERARY_DATA = {
+        1: {
+          dayTitle: 'Day 1（週五）：抵達市區、人氣越式洗髮與米其林晚餐',
+          accentColor: 'bg-mango',
+          summary: '16:50 抵達新山一機場後搭乘 Grab 入城，以暖胃河粉與療癒洗髮開啟週末夜。',
+          items: [
+            {
+              time: '18:30 – 19:30',
+              title: '飯店 Check-in 與晚餐：米其林推薦越南河粉',
+              mustGo: true,
+              transport: { label: '🚕 Grab 叫車 / 步行', color: 'bg-mango/45' },
+              hours: '如 Phở Hòa Pasteur (06:00–00:00) 或 Pho Dậu (06:00–21:00)',
+              note: '抵達市區後馬上享用暖胃的道地河粉，清甜湯頭搭配新鮮香草與檸檬超開胃。',
+              icon: 'pho'
+            },
+            {
+              time: '19:30 – 21:00',
+              title: '越式洗髮體驗',
+              mustGo: true,
+              transport: { label: '🚶 步行 / Grab', color: 'bg-coconut/30' },
+              hours: '多數至 21:00 / 22:00',
+              note: '體驗肩頸紓壓、臉部清潔與草本水療洗髮，徹底洗去一週的工作與飛行疲勞。',
+              icon: 'spa'
+            },
+            {
+              time: '21:00 之後',
+              title: '特色咖啡：NHA BA TERIA',
+              mustGo: false,
+              transport: { label: '🚕 Grab / 步行', color: 'bg-ocean/30' },
+              hours: '深夜營業咖啡廳',
+              address: '72/17 Trần Quốc Toản, Xuân Hòa, Hồ Chí Minh 70000越南',
+              note: '享受深夜的特色咖啡與愜意時光，感受西貢越夜越迷人的慢步調。',
+              icon: 'coffee'
+            }
+          ]
+        },
+        2: {
+          dayTitle: 'Day 2（週六）：粉紅教堂、人氣 Pizza 午餐與市區漫步',
+          accentColor: 'bg-dragonfruit',
+          summary: '從晨光中的夢幻粉紅教堂出發，串聯法式殖民地標、咖啡公寓選物與在地美食！',
+          items: [
+            {
+              time: '09:00 – 10:30',
+              title: '粉紅教堂（耶穌聖心堂）',
+              mustGo: true,
+              transport: { label: '🚕 Grab 叫車', color: 'bg-mango/45' },
+              hours: '內部參觀通常 08:00–11:00（早晨光線最好）',
+              mapQuery: 'Tan Dinh Church 289 Hai Ba Trung Ho Chi Minh',
+              note: '把握早晨柔和順光拍出夢幻粉紅建築美照，建議穿著端莊得體。',
+              icon: 'church'
+            },
+            {
+              time: '10:30 – 12:00',
+              title: '西貢中心郵政局 → 書街 → 獨立宮',
+              mustGo: true,
+              transport: { label: '🚕 Grab → 🚶 步行', color: 'bg-coconut/30' },
+              hours: '郵政局 08:00–17:00｜書街 08:00–21:30｜獨立宮 08:00–16:30',
+              mapQuery: 'Saigon Central Post Office & Independence Palace Ho Chi Minh',
+              note: '欣賞百年法式古典穹頂建築並寄張明信片，漫步綠蔭書街後順遊歷史地標獨立宮（統一宮）。',
+              icon: 'post'
+            },
+            {
+              time: '12:00 – 13:30',
+              title: "午餐：Pizza 4P's 披薩",
+              mustGo: true,
+              reserved: true,
+              editableAddressKey: 'pizza4ps',
+              transport: { label: '🚶 步行 / Grab', color: 'bg-coconut/30' },
+              hours: '10:30 / 11:00–22:00',
+              mapQuery: "Pizza 4P's Ho Chi Minh",
+              note: '參觀完地標後，直接步行或搭車前往預訂好的 Pizza 4P’s 享用招牌布拉塔起司披薩。',
+              icon: 'pizza'
+            },
+            {
+              time: '13:30 – 15:00',
+              title: '咖啡公寓 → GARMENTORY 選物店 → The E.Y.E Saigon',
+              mustGo: true,
+              transport: { label: '🚶 悠閒步行', color: 'bg-coconut/30' },
+              hours: '咖啡公寓 08:00–22:00｜GARMENTORY 約 10:00–20:00',
+              mapQuery: 'The Cafe Apartment 42 Nguyen Hue Ho Chi Minh',
+              recommendations: ['設計帆布包', '編織包', '彩色網袋'],
+              note: '探索一格格充滿驚喜的文青咖啡館與越南設計師選物店，別錯過 The E.Y.E Saigon 的特色包袋！',
+              icon: 'apartment'
+            },
+            {
+              time: '15:00 – 17:00',
+              title: '超市大掃貨',
+              mustGo: false,
+              transport: { label: '🚶 步行 / Grab', color: 'bg-ocean/30' },
+              hours: '超市通常至 22:00',
+              recommendations: [
+                '高露潔牙膏（哈利波特款）',
+                'G7 咖啡',
+                '中原傳奇（Trung Nguyên Legend）',
+                'MR. VIET',
+                'ARCHCAFE',
+                '越南滴漏壺（Phin）'
+              ],
+              note: '一次補齊人氣限定哈利波特聯名高露潔牙膏、各大品牌越南咖啡與道地沖泡滴漏壺（Phin）！',
+              icon: 'bag'
+            },
+            {
+              time: '17:30 – 19:00',
+              title: '特色咖啡：DABAO CONCEPT',
+              mustGo: false,
+              transport: { label: '🚕 Grab / 步行', color: 'bg-ocean/30' },
+              hours: '約 07:00–21:00 / 22:00',
+              mapQuery: 'DABAO CONCEPT Ho Chi Minh',
+              note: '傍晚歇腳時刻，在充滿南洋庭院與懷舊老宅氛圍的 DABAO CONCEPT 小憩片刻。',
+              icon: 'coffee'
+            },
+            {
+              time: '19:30 之後',
+              title: '晚餐：胖媽廚房 (Madam Cuc Saigon)',
+              mustGo: true,
+              reserved: true,
+              transport: { label: '🚕 Grab 叫車', color: 'bg-mango/45' },
+              hours: '10:00–22:00',
+              address: '136/9 Lê Thánh Tôn, Bến Thành, Hồ Chí Minh, 越南',
+              note: '晚餐品嚐道地的越南家常菜，為充實的一天作結。',
+              icon: 'pho'
+            },
+            {
+              time: '宵夜',
+              title: 'Bánh Mì Huỳnh Hoa',
+              mustGo: true,
+              transport: { label: '🚕 Grab / 外帶回飯店', color: 'bg-dragonfruit/30' },
+              hours: '通常至 21:00 / 22:00（建議留意打烊時間提前購買）',
+              address: '26 Lê Thị Riêng, Bến Thành, Hồ Chí Minh, 越南',
+              note: '買個份量十足、內餡超豐富的地表最強越式法國麵包回飯店當宵夜！',
+              icon: 'banhmi'
+            }
+          ]
+        },
+        3: {
+          dayTitle: 'Day 3（週日）：悠閒按摩與完美賦歸',
+          accentColor: 'bg-ocean',
+          summary: '睡到自然醒，用全身按摩與早午餐為假期畫下句點，14:30 準時出發前往機場。',
+          items: [
+            {
+              time: '10:00 – 11:30',
+              title: '全身按摩',
+              mustGo: true,
+              transport: { label: '🚶 步行 / Grab', color: 'bg-coconut/30' },
+              hours: 'SPA 館大多從 09:00 / 10:00 開始',
+              note: '週日早晨安排一場精油或熱石全身按摩，徹底放鬆身心。',
+              icon: 'spa'
+            },
+            {
+              time: '11:30 – 13:00',
+              title: '午餐與自由活動',
+              mustGo: false,
+              transport: { label: '🚶 悠閒步行', color: 'bg-coconut/30' },
+              hours: '',
+              note: '輕鬆享用早午餐或來杯最後的越式煉乳冰咖啡時光。',
+              icon: 'coffee'
+            },
+            {
+              time: '13:00 – 14:30',
+              title: '最後採購與整理行李',
+              mustGo: false,
+              transport: { label: '🚶 步行 / 飯店整理', color: 'bg-ocean/30' },
+              hours: '',
+              note: '檢查戰利品與牙膏是否妥善裝箱（注意液體/牙膏容量超過 100ml 需託運）。',
+              icon: 'bag'
+            },
+            {
+              time: '14:30',
+              title: '搭乘 Grab 前往新山一國際機場',
+              mustGo: true,
+              transport: { label: '🚕 Grab 叫車', color: 'bg-mango/45' },
+              hours: '車程約 30–45 分鐘（建議預留塞車與出境時間）',
+              note: '確認護照與隨身物品皆已帶齊，前往國際航廈辦理星宇航空報到。',
+              icon: 'car'
+            },
+            {
+              time: '18:00',
+              title: '搭機起飛，返回溫暖的家！',
+              mustGo: false,
+              transport: { label: '✈️ 星宇航空 JX714', color: 'bg-ocean/35' },
+              hours: '18:00 SGN 起飛 → 22:20 抵達 TPE',
+              note: '帶著滿滿的南洋陽光回憶與戰利品平安返台！',
+              icon: 'plane'
+            }
+          ]
         }
-      });
-
-      // 產生當日總覽橫幅與時間軸卡片
-      const itemsHtml = data.items
-        .map((item, idx) => {
-          const isLast = idx === data.items.length - 1;
-          return `
-            <div class="relative pl-8 ${isLast ? '' : 'pb-5'}">
-              <!-- 左側垂直連接線 -->
-              ${!isLast ? '<span class="absolute left-[11px] top-6 bottom-0 w-[2px] bg-coffee/20 rounded-full"></span>' : ''}
-              <!-- 時間軸圓點 -->
-              <span class="absolute left-0 top-1.5 w-6 h-6 rounded-full ${item.mustGo ? 'bg-dragonfruit' : 'bg-mango'} border-2 border-coffee flex items-center justify-center text-[10px] font-bold text-white">
-                ${idx + 1}
-              </span>
-
-              <!-- 行程卡片 -->
-              <article class="illust-card p-4">
-                <div class="flex items-start justify-between gap-2">
-                  <div class="space-y-1.5">
-                    <!-- 時間與標籤列 -->
-                    <div class="flex flex-wrap items-center gap-1.5">
-                      <span class="px-2.5 py-0.5 rounded-full bg-cream border border-coffee/20 font-display font-bold text-xs text-coffee">
-                        ⏰ ${item.time}
-                      </span>
-                      ${
-                        item.mustGo
-                          ? '<span class="px-2.5 py-0.5 rounded-full bg-dragonfruit text-white border border-coffee/20 text-xs font-bold tracking-wide">★ 必去</span>'
-                          : ''
-                      }
-                      <span class="px-2.5 py-0.5 rounded-full ${item.transport.color} border border-coffee/15 text-xs font-medium text-coffee">
-                        ${item.transport.label}
-                      </span>
-                    </div>
-
-                    <!-- 景點標題 -->
-                    <h3 class="font-display font-black text-base sm:text-lg text-coffee leading-snug pt-0.5">
-                      ${item.title}
-                    </h3>
-                  </div>
-
-                  <!-- 小插畫徽章 -->
-                  <div class="w-10 h-10 rounded-2xl bg-cream border border-coffee/15 flex items-center justify-center shrink-0">
-                    ${getSpotSvg(item.icon)}
-                  </div>
-                </div>
-
-                <!-- 營業時間與備註 -->
-                <div class="mt-2.5 space-y-1 text-xs sm:text-sm text-coffee/85 leading-relaxed">
-                  ${
-                    item.hours
-                      ? `<p class="flex items-start gap-1.5 text-coffee/75"><span class="shrink-0">🕒</span><span><strong>營業時間：</strong>${item.hours}</span></p>`
-                      : ''
-                  }
-                  ${
-                    item.note
-                      ? `<p class="flex items-start gap-1.5"><span class="shrink-0">📝</span><span>${item.note}</span></p>`
-                      : ''
-                  }
-                </div>
-              </article>
-            </div>
-          `;
-        })
-        .join('');
-
-      timelineContainer.innerHTML = `
-        <div class="p-3.5 rounded-2xl ${data.accentColor}/20 border border-coffee/15 mb-4">
-          <h3 class="font-display font-black text-base sm:text-lg text-coffee">${data.dayTitle}</h3>
-          <p class="text-xs sm:text-sm text-coffee/80 mt-1">${data.summary}</p>
-        </div>
-        <div>${itemsHtml}</div>
-      `;
-
-      // 觸發彈跳過渡動畫
-      if (animate) {
-        timelineContainer.classList.remove('animate-tab-bounce');
-        void timelineContainer.offsetWidth; // 強制 reflow 以重啟動畫
-        timelineContainer.classList.add('animate-tab-bounce');
-      }
-    }
-
-    dayTabs.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        renderDayItinerary(btn.dataset.day, true);
-      });
-    });
-
-    // ==========================================
-    // 3. 出發倒數計時器 (目標時間: 2026-12-04 14:00 GMT+8)
-    // ==========================================
-    const DEPARTURE_TIME = new Date('2026-12-04T14:00:00+08:00').getTime();
-
-    function updateCountdown() {
-      const now = Date.now();
-      const diff = DEPARTURE_TIME - now;
-
-      const daysEl = document.getElementById('cd-days');
-      const hoursEl = document.getElementById('cd-hours');
-      const minsEl = document.getElementById('cd-mins');
-      const secsEl = document.getElementById('cd-secs');
-      const subtextEl = document.getElementById('countdownSubtext');
-
-      if (diff <= 0) {
-        daysEl.textContent = '00';
-        hoursEl.textContent = '00';
-        minsEl.textContent = '00';
-        secsEl.textContent = '00';
-        subtextEl.textContent = '🎉 旅程已經展開！祝在胡志明市玩得開心！';
-        return;
-      }
-
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const mins = Math.floor((diff / (1000 * 60)) % 60);
-      const secs = Math.floor((diff / 1000) % 60);
-
-      daysEl.textContent = String(days).padStart(2, '0');
-      hoursEl.textContent = String(hours).padStart(2, '0');
-      minsEl.textContent = String(mins).padStart(2, '0');
-      secsEl.textContent = String(secs).padStart(2, '0');
-    }
-
-    // ==========================================
-    // 4. 住宿資訊編輯與一鍵複製 (支援 localStorage)
-    // ==========================================
-    const HOTEL_STORAGE_KEY = 'sgn_2026_hotel_info_v2';
-    const defaultHotel = {
-      name: 'G8 Center Hotel Sài Gòn',
-      address: '157-157A Pasteur, Xuân Hòa, Hồ Chí Minh 700000, Vietnam',
-      phone: '+84 28 3936 2101',
-      checkIn: '12/04 (五) 15:00 後',
-      checkOut: '12/06 (日) 12:00 前'
-    };
-
-    let hotelData = defaultHotel;
-    try {
-      const savedHotel = localStorage.getItem(HOTEL_STORAGE_KEY);
-      if (savedHotel) hotelData = { ...defaultHotel, ...JSON.parse(savedHotel) };
-    } catch (e) {}
-
-    const hotelViewMode = document.getElementById('hotelViewMode');
-    const hotelEditForm = document.getElementById('hotelEditForm');
-    const toggleEditHotelBtn = document.getElementById('toggleEditHotelBtn');
-    const cancelHotelEditBtn = document.getElementById('cancelHotelEditBtn');
-
-    function syncHotelUI() {
-      document.getElementById('hotelNameDisplay').textContent = hotelData.name;
-      document.getElementById('hotelAddressDisplay').textContent = `📍 ${hotelData.address}`;
-      const phoneEl = document.getElementById('hotelPhoneDisplay');
-      phoneEl.textContent = hotelData.phone;
-      phoneEl.href = `tel:${hotelData.phone.replace(/[^+\d]/g, '')}`;
-      document.getElementById('hotelCheckInDisplay').textContent = hotelData.checkIn;
-      document.getElementById('hotelCheckOutDisplay').textContent = hotelData.checkOut;
-      document.getElementById('openHotelMapLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotelData.name + ' ' + hotelData.address)}`;
-    }
-
-    toggleEditHotelBtn.addEventListener('click', () => {
-      document.getElementById('hotelNameInput').value = hotelData.name;
-      document.getElementById('hotelAddressInput').value = hotelData.address;
-      document.getElementById('hotelPhoneInput').value = hotelData.phone;
-      document.getElementById('hotelCheckInInput').value = hotelData.checkIn;
-      document.getElementById('hotelCheckOutInput').value = hotelData.checkOut;
-      hotelViewMode.classList.add('hidden');
-      hotelEditForm.classList.remove('hidden');
-    });
-
-    cancelHotelEditBtn.addEventListener('click', () => {
-      hotelEditForm.classList.add('hidden');
-      hotelViewMode.classList.remove('hidden');
-    });
-
-    hotelEditForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      hotelData = {
-        name: document.getElementById('hotelNameInput').value.trim() || defaultHotel.name,
-        address: document.getElementById('hotelAddressInput').value.trim() || defaultHotel.address,
-        phone: document.getElementById('hotelPhoneInput').value.trim() || defaultHotel.phone,
-        checkIn: document.getElementById('hotelCheckInInput').value.trim() || defaultHotel.checkIn,
-        checkOut: document.getElementById('hotelCheckOutInput').value.trim() || defaultHotel.checkOut
       };
-      try {
-        localStorage.setItem(HOTEL_STORAGE_KEY, JSON.stringify(hotelData));
-      } catch (err) {}
-      syncHotelUI();
-      hotelEditForm.classList.add('hidden');
-      hotelViewMode.classList.remove('hidden');
-      showToast('✅ 已更新住宿資訊！');
-    });
 
-    // 使用 execCommand('copy') 安全複製文字
-    document.getElementById('copyHotelAddrBtn').addEventListener('click', () => {
-      const textToCopy = `${hotelData.name} - ${hotelData.address}`;
-      const tempInput = document.createElement('textarea');
-      tempInput.value = textToCopy;
-      tempInput.style.position = 'fixed';
-      tempInput.style.opacity = '0';
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      try {
-        document.execCommand('copy');
-        showToast('📋 已複製飯店名稱與地址！');
-      } catch (err) {
-        showToast('⚠️ 無法自動複製，請手動選取地址');
-      }
-      document.body.removeChild(tempInput);
-    });
+      window.ITINERARY_DATA = ITINERARY_DATA;
 
-    // ==========================================
-    // 5. 可打勾清單系統 (待辦清單、出發前清單、行李清單)
-    // ==========================================
-    const CHECKLIST_STORAGE_KEY = 'sgn_2026_checklists_v1';
-    const DEFAULT_CHECKLISTS = [
-      {
-        id: 'todo',
-        title: '旅行待辦清單',
-        subtitle: '行前預約與當地 App 準備',
-        badgeColor: 'bg-mango',
-        icon: '📝',
-        items: [
-          { id: 't1', text: "線上預約 Day 2 午餐：Pizza 4P's 披薩", checked: false },
-          { id: 't2', text: '預約 Day 1 越式洗髮 & Day 3 全身按摩時段', checked: false },
-          { id: 't3', text: '下載 Grab App 並完成台灣信用卡綁定與簡訊驗證', checked: false },
-          { id: 't4', text: '購買越南網卡 / eSIM 並確認開通方式', checked: false },
-          { id: 't5', text: '兌換美金大鈔（準備至越南銀樓換越南盾 VND）', checked: false }
+      // SPA 推薦口袋名單資料
+      const SPA_DATA = {
+        title: 'SPA 與越式洗髮推薦口袋名單',
+        accentColor: 'bg-coconut',
+        summary: '依照「新定教堂／G8 Center 飯店附近」與「濱城市場附近」分類整理，點擊即可複製地址或開啟 Google 地圖導航。',
+        categories: [
+          {
+            areaTitle: '新定教堂、飯店附近',
+            areaBadge: '鄰近 G8 Center Hotel & 粉紅教堂',
+            badgeColor: 'bg-dragonfruit/20',
+            places: [
+              {
+                name: 'SHINRIN SPA',
+                hours: '09:00–22:00',
+                address: 'Nam Kỳ Khởi Nghĩa/213A Võ Thị Sáu, Xuân Hòa, Hồ Chí Minh 700000越南',
+                klook: false
+              },
+              {
+                name: 'DAY SPA - SPA DƯỠNG SINH',
+                hours: '09:30–21:30',
+                address: '68 Đinh Công Tráng, Tân Định, Hồ Chí Minh 71008越南',
+                klook: true
+              }
+            ]
+          },
+          {
+            areaTitle: '濱城市場附近',
+            areaBadge: '第一郡市中心逛街順遊',
+            badgeColor: 'bg-mango/35',
+            places: [
+              {
+                name: 'Spa & Hair Salon Xuan Lan',
+                hours: '10:00–22:20',
+                address: '55/32 Lê Thị Hồng Gấm, Bến Thành, Hồ Chí Minh 700000越南',
+                klook: false
+              },
+              {
+                name: 'Laboho Spa',
+                hours: '10:00–22:20',
+                address: '17 Đặng Thị Nhu, Bến Thành, Hồ Chí Minh 700000越南',
+                klook: false
+              }
+            ]
+          }
         ]
-      },
-      {
-        id: 'predeparture',
-        title: '出發前清單',
-        subtitle: '證件文件與重要憑證檢查',
-        badgeColor: 'bg-dragonfruit',
-        icon: '🛂',
-        items: [
-          { id: 'p1', text: '確認護照有效期限（需 6 個月以上）', checked: false },
-          { id: 'p2', text: '申請並「列印紙本」越南電子簽證 (E-Visa)', checked: false },
-          { id: 'p3', text: '列印星宇航空電子機票（JX713 / JX714）與住宿憑證', checked: false },
-          { id: 'p4', text: '投保海外旅遊平安險與班機延誤不便險', checked: false },
-          { id: 'p5', text: '出發前 48 小時完成星宇航空網路預辦登機', checked: false }
-        ]
-      },
-      {
-        id: 'packing',
-        title: '行李清單',
-        subtitle: '12月胡志明市（約 24°C–32°C 晴朗微熱）穿搭與必備品',
-        badgeColor: 'bg-coconut',
-        icon: '🧳',
-        items: [
-          { id: 'k1', text: '透氣夏季衣物 3 套 ＋ 薄長袖外套（機上與冷氣房用）', checked: false },
-          { id: 'k2', text: '好走的休閒鞋或涼鞋（Day 2 市區漫步必備）', checked: false },
-          { id: 'k3', text: '太陽眼鏡、防曬乳、晴雨兩用摺疊傘', checked: false },
-          { id: 'k4', text: '個人常備藥品（腸胃藥、止痛藥、防蚊液、OK繃）', checked: false },
-          { id: 'k5', text: '行動電源（隨身攜帶勿託運）、充電線與轉接頭（越南雙圓/雙扁孔通用）', checked: false },
-          { id: 'k6', text: '大型摺疊購物袋（裝哈利波特牙膏與超市伴手禮！）', checked: false }
-        ]
-      }
-    ];
+      };
 
-    let checklistsState = DEFAULT_CHECKLISTS;
-    try {
-      const savedLists = localStorage.getItem(CHECKLIST_STORAGE_KEY);
-      if (savedLists) checklistsState = JSON.parse(savedLists);
-    } catch (e) {}
-
-    function saveChecklists() {
+      // 可自訂補充的行程地址 (如 Pizza 4P's 分店地址)
+      const CUSTOM_SPOT_ADDR_KEY = 'sgn_2026_spot_addresses_v1';
+      let customSpotAddresses = {};
       try {
-        localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(checklistsState));
+        const savedSpotAddrs = localStorage.getItem(CUSTOM_SPOT_ADDR_KEY);
+        if (savedSpotAddrs) customSpotAddresses = JSON.parse(savedSpotAddrs);
       } catch (e) {}
-    }
 
-    const checklistsContainer = document.getElementById('checklistsContainer');
+      function copyTextToClipboard(text, successMsg = '📋 已複製地址！') {
+        const tempInput = document.createElement('textarea');
+        tempInput.value = text;
+        tempInput.style.position = 'fixed';
+        tempInput.style.opacity = '0';
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        try {
+          document.execCommand('copy');
+          showToast(successMsg);
+        } catch (err) {
+          showToast('⚠️ 無法自動複製，請手動選取文字');
+        }
+        document.body.removeChild(tempInput);
+      }
 
-    function renderChecklists() {
-      checklistsContainer.innerHTML = checklistsState
-        .map((list) => {
-          const total = list.items.length;
-          const done = list.items.filter((i) => i.checked).length;
-          const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+      // 行程小插畫 SVG 圖示庫 (保持一致的 1.5px 咖啡棕手繪線條風格)
+      function getSpotSvg(type) {
+        const icons = {
+          pho: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 13h20c0 6-4.5 10-10 10S4 19 4 13z" fill="#F6C453"/>
+                  <path d="M8 23h12" />
+                  <path d="M9 9c0-2 1.5-2.5 1.5-4.5M14 9c0-2 1.5-2.5 1.5-4.5M19 9c0-2 1.5-2.5 1.5-4.5" />
+                </svg>`,
+          spa: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 6c3 4 4 8 0 13-4-5-3-9 0-13z" fill="#E97870"/>
+                  <path d="M14 19c-5-1-8-4-8-8 4 0 7 3 8 8z" fill="#78A77B"/>
+                  <path d="M14 19c5-1 8-4 8-8-4 0-7 3-8 8z" fill="#78A77B"/>
+                  <path d="M7 22h14" />
+                </svg>`,
+          coffee: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M8 10h12l-1.5 12h-9L8 10z" fill="#55AFC5"/>
+                  <path d="M9.2 18h9.6l-.5 4h-8.6l-.5-4z" fill="#FFF9F0"/>
+                  <path d="M17 5l-3 9" stroke="#E97870" stroke-width="1.8"/>
+                </svg>`,
+          church: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="14,4 9,13 19,13" fill="#E97870"/>
+                  <rect x="8" y="13" width="12" height="11" rx="1" fill="#E97870"/>
+                  <path d="M12 24v-5a2 2 0 0 1 4 0v5" fill="#FFF9F0"/>
+                  <path d="M14 2v2" />
+                </svg>`,
+          post: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="7" width="20" height="14" rx="2" fill="#F6C453"/>
+                  <path d="M4 9l10 7 10-7" />
+                </svg>`,
+          pizza: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 5L5 21c6 2.5 12 2.5 18 0L14 5z" fill="#F6C453"/>
+                  <circle cx="13" cy="14" r="1.5" fill="#E97870"/>
+                  <circle cx="16.5" cy="18" r="1.5" fill="#E97870"/>
+                </svg>`,
+          apartment: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="6" y="4" width="16" height="20" rx="2" fill="#FFF9F0"/>
+                  <rect x="9" y="7" width="4" height="4" fill="#F6C453"/>
+                  <rect x="15" y="7" width="4" height="4" fill="#55AFC5"/>
+                  <rect x="9" y="13" width="4" height="4" fill="#E97870"/>
+                  <rect x="15" y="13" width="4" height="4" fill="#78A77B"/>
+                </svg>`,
+          bag: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7 10h14l1 13H6L7 10z" fill="#78A77B"/>
+                  <path d="M10 10V8a4 4 0 0 1 8 0v2" />
+                </svg>`,
+          banhmi: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="10" width="20" height="9" rx="4.5" transform="rotate(-15 14 14.5)" fill="#F6C453"/>
+                  <path d="M9 13l3 2M13 11l3 2M17 10l2 2" stroke="#78A77B"/>
+                </svg>`,
+          car: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 16l2-6h12l2 6v5H6v-5z" fill="#78A77B"/>
+                  <circle cx="9.5" cy="21" r="2" fill="#FFF9F0"/>
+                  <circle cx="18.5" cy="21" r="2" fill="#FFF9F0"/>
+                </svg>`,
+          plane: `<svg class="w-6 h-6" viewBox="0 0 28 28" fill="none" stroke="#55443B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 16l20-6-7 11-4-3-4 2v-4l-5 0z" fill="#55AFC5"/>
+                </svg>`
+        };
+        return icons[type] || icons.coffee;
+      }
 
-          const itemsHtml = list.items
-            .map(
-              (item) => `
-              <li class="group flex items-center justify-between gap-2.5 py-2 border-b border-coffee/10 last:border-b-0">
-                <label class="flex items-start gap-3 cursor-pointer flex-1 select-none">
-                  <input
-                    type="checkbox"
-                    class="custom-checkbox mt-0.5"
-                    data-list-id="${list.id}"
-                    data-item-id="${item.id}"
-                    ${item.checked ? 'checked' : ''}
-                  />
-                  <span class="text-sm leading-snug transition-colors ${
-                    item.checked ? 'line-through text-coffee/45' : 'text-coffee font-medium'
-                  }">
-                    ${escapeHtml(item.text)}
-                  </span>
-                </label>
-                <button
-                  type="button"
-                  title="刪除此項目"
-                  aria-label="刪除此項目"
-                  data-delete-list="${list.id}"
-                  data-delete-item="${item.id}"
-                  class="opacity-60 hover:opacity-100 text-xs text-coffee/60 hover:text-dragonfruit px-1.5 py-0.5 rounded transition-opacity"
-                >
-                  ✕
-                </button>
-              </li>
-            `
-            )
-            .join('');
+      // ==========================================
+      // 2. 渲染每日行程時間軸與日期切換彈跳效果
+      // ==========================================
+      let currentTabKey = '1';
 
-          return `
-            <div class="illust-card p-4 sm:p-5">
-              <!-- 清單標題與完成度 -->
-              <div class="flex items-start justify-between gap-2 mb-2">
-                <div class="flex items-center gap-2.5">
-                  <span class="inline-flex items-center justify-center w-9 h-9 rounded-2xl ${list.badgeColor}/30 border border-coffee/20 text-lg">
-                    ${list.icon}
-                  </span>
-                  <div>
-                    <h3 class="font-display font-black text-lg text-coffee">${list.title}</h3>
-                    <p class="text-xs text-coffee/70">${list.subtitle}</p>
-                  </div>
-                </div>
-                <span class="px-2.5 py-1 rounded-full bg-cream border border-coffee/20 font-display font-bold text-xs text-coffee shrink-0">
-                  ${done} / ${total}
+      function getTimelineContainer() {
+        return document.getElementById('timelineContainer');
+      }
+
+      function renderSpaSection() {
+        const spaListContainer = document.getElementById('spaListContainer');
+        if (!spaListContainer) return;
+        const categoriesHtml = SPA_DATA.categories
+          .map(
+            (cat) => `
+            <div class="space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                <h4 class="font-display font-black text-base sm:text-lg text-coffee flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-coconut inline-block"></span>
+                  <span>${cat.areaTitle}</span>
+                </h4>
+                <span class="px-2.5 py-0.5 rounded-full ${cat.badgeColor} border border-coffee/15 text-[11px] font-bold text-coffee">
+                  ${cat.areaBadge}
                 </span>
               </div>
 
-              <!-- 進度條 -->
-              <div class="w-full h-2 rounded-full bg-creamDark overflow-hidden mb-3 border border-coffee/10">
-                <div class="h-full ${list.badgeColor} transition-all duration-300" style="width: ${percent}%"></div>
+              <div class="grid grid-cols-1 gap-3">
+                ${cat.places
+                  .map((place, idx) => {
+                    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + place.address)}`;
+                    return `
+                      <article class="illust-card p-4">
+                        <div class="flex items-start justify-between gap-2">
+                          <div class="space-y-1.5">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                              <span class="px-2.5 py-0.5 rounded-full bg-cream border border-coffee/20 font-display font-bold text-xs text-coffee">
+                                0${idx + 1}
+                              </span>
+                              ${
+                                place.klook
+                                  ? '<span class="px-2.5 py-0.5 rounded-full bg-mango/60 border border-coffee/20 text-xs font-bold text-coffee">🎫 可在 Klook 預約</span>'
+                                  : ''
+                              }
+                            </div>
+                            <h5 class="font-display font-black text-base sm:text-lg text-coffee leading-snug">
+                              ${place.name}
+                            </h5>
+                          </div>
+                          <div class="w-10 h-10 rounded-2xl bg-cream border border-coffee/15 flex items-center justify-center shrink-0">
+                            ${getSpotSvg('spa')}
+                          </div>
+                        </div>
+
+                        <div class="mt-2.5 space-y-1.5 text-xs sm:text-sm text-coffee/85">
+                          <p class="flex items-start gap-1.5 text-coffee/75">
+                            <span class="shrink-0">🕒</span>
+                            <span><strong>營業時間：</strong>${place.hours}</span>
+                          </p>
+                          <p class="flex items-start gap-1.5 text-coffee/85">
+                            <span class="shrink-0">📍</span>
+                            <span><strong>地址：</strong>${place.address}</span>
+                          </p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2 mt-3 pt-2.5 border-t border-coffee/10">
+                          <button
+                            type="button"
+                            data-copy-text="${escapeHtml(place.name + ' - ' + place.address)}"
+                            class="copy-spot-btn btn-bounce inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-mango/45 border border-coffee/20 text-xs font-bold text-coffee hover:bg-mango/65 transition-colors"
+                          >
+                            📋 複製地址
+                          </button>
+                          <a
+                            href="${mapUrl}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn-bounce inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-white border border-coffee/20 text-xs font-bold text-coffee hover:bg-cream transition-colors"
+                          >
+                            🗺️ 開啟地圖
+                          </a>
+                        </div>
+                      </article>
+                    `;
+                  })
+                  .join('')}
               </div>
-
-              <!-- 勾選列表 -->
-              <ul class="divide-y divide-coffee/5 mb-3">
-                ${itemsHtml || '<li class="py-3 text-center text-xs text-coffee/50">目前沒有項目，在下方新增一個吧！</li>'}
-              </ul>
-
-              <!-- 新增自訂項目輸入框 -->
-              <form class="add-item-form flex items-center gap-2" data-list-id="${list.id}">
-                <input
-                  type="text"
-                  placeholder="新增項目..."
-                  class="flex-1 px-3 py-2 rounded-xl bg-cream border border-coffee/20 text-xs sm:text-sm text-coffee placeholder:text-coffee/45 focus:outline-none focus:border-coffee/50"
-                />
-                <button
-                  type="submit"
-                  class="btn-bounce px-3.5 py-2 rounded-xl ${list.badgeColor}/40 border border-coffee/25 text-xs font-bold text-coffee hover:${list.badgeColor}/60 transition-colors shrink-0"
-                >
-                  ＋ 新增
-                </button>
-              </form>
             </div>
-          `;
-        })
-        .join('');
-    }
+          `
+          )
+          .join('');
 
-    // 委派監聽打勾、刪除與新增表單事件
-    checklistsContainer.addEventListener('change', (e) => {
-      if (e.target.matches('input[type="checkbox"]')) {
-        const listId = e.target.dataset.listId;
-        const itemId = e.target.dataset.itemId;
-        const targetList = checklistsState.find((l) => l.id === listId);
-        if (targetList) {
-          const targetItem = targetList.items.find((i) => i.id === itemId);
-          if (targetItem) {
-            targetItem.checked = e.target.checked;
-            saveChecklists();
-            renderChecklists();
+        spaListContainer.innerHTML = `
+          <div class="p-3.5 rounded-2xl ${SPA_DATA.accentColor}/20 border border-coffee/15 mb-4">
+            <p class="text-xs sm:text-sm text-coffee/85">${SPA_DATA.summary}</p>
+          </div>
+          <div class="space-y-6">${categoriesHtml}</div>
+        `;
+      }
+
+      function renderDayItinerary(dayKey, animate = true) {
+        currentTabKey = String(dayKey);
+        const timelineContainer = getTimelineContainer();
+        const dayTabs = document.querySelectorAll('.day-tab');
+        if (!timelineContainer) return;
+
+        // 更新 Tab 樣式
+        dayTabs.forEach((btn) => {
+          const isSelected = btn.dataset.day === currentTabKey;
+          btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+          if (isSelected) {
+            btn.className = 'day-tab btn-bounce py-2 px-2 rounded-xl font-display font-bold text-xs sm:text-sm transition-all bg-mango text-coffee border border-coffee/25 shadow-sm';
+          } else {
+            btn.className = 'day-tab btn-bounce py-2 px-2 rounded-xl font-display font-bold text-xs sm:text-sm transition-all text-coffee/75 hover:text-coffee border border-transparent';
+          }
+        });
+
+        const data = ITINERARY_DATA[currentTabKey];
+        if (!data) return;
+
+        // 產生當日總覽橫幅與時間軸卡片
+        const itemsHtml = data.items
+          .map((item, idx) => {
+            const isLast = idx === data.items.length - 1;
+            const customAddr = item.editableAddressKey ? (customSpotAddresses[item.editableAddressKey] || '') : '';
+            const effectiveAddress = item.address || customAddr;
+            const hasMapAction = Boolean(effectiveAddress || item.mapQuery || item.editableAddressKey);
+            const mapSearchQuery = effectiveAddress
+              ? `${item.title.replace(/^(午餐|晚餐|特色咖啡|宵夜)：/, '')} ${effectiveAddress}`
+              : item.mapQuery || item.title;
+            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapSearchQuery)}`;
+
+            const recommendationsHtml = item.recommendations
+              ? `
+                <div class="mt-2 p-2.5 rounded-xl bg-cream border border-coffee/15">
+                  <p class="text-xs font-bold text-coffee mb-1.5">🛍️ 推薦必買清單：</p>
+                  <div class="flex flex-wrap gap-1.5">
+                    ${item.recommendations
+                      .map(
+                        (rec) =>
+                          `<span class="px-2.5 py-0.5 rounded-full bg-white border border-coffee/20 text-xs font-medium text-coffee">✨ ${rec}</span>`
+                      )
+                      .join('')}
+                  </div>
+                </div>
+              `
+              : '';
+
+            const addressDisplayHtml = effectiveAddress
+              ? `<p class="flex items-start gap-1.5 text-coffee/85"><span class="shrink-0">📍</span><span><strong>地址：</strong>${escapeHtml(effectiveAddress)}</span></p>`
+              : item.editableAddressKey
+              ? `<p class="flex items-start gap-1.5 text-coffee/65"><span class="shrink-0">📍</span><span><strong>地址：</strong>尚未填寫分店地址（可點擊下方按鈕補上）</span></p>`
+              : '';
+
+            const actionButtonsHtml = hasMapAction
+              ? `
+                <div class="flex flex-wrap items-center gap-2 mt-2.5 pt-2.5 border-t border-coffee/10">
+                  ${
+                    effectiveAddress
+                      ? `<button
+                          type="button"
+                          data-copy-text="${escapeHtml(item.title.replace(/^(午餐|晚餐|特色咖啡|宵夜)：/, '') + ' - ' + effectiveAddress)}"
+                          class="copy-spot-btn btn-bounce inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-mango/45 border border-coffee/20 text-xs font-bold text-coffee hover:bg-mango/65 transition-colors"
+                        >
+                          📋 複製地址
+                        </button>`
+                      : ''
+                  }
+                  <a
+                    href="${mapUrl}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn-bounce inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-white border border-coffee/20 text-xs font-bold text-coffee hover:bg-cream transition-colors"
+                  >
+                    🗺️ 開啟地圖
+                  </a>
+                  ${
+                    item.editableAddressKey
+                      ? `<button
+                          type="button"
+                          data-edit-spot-addr="${item.editableAddressKey}"
+                          class="edit-spot-addr-btn btn-bounce inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-cream border border-coffee/20 text-xs font-bold text-coffee hover:bg-mango/30 transition-colors"
+                        >
+                          ✏️ ${effectiveAddress ? '修改地址' : '補填分店地址'}
+                        </button>`
+                      : ''
+                  }
+                </div>
+                ${
+                  item.editableAddressKey
+                    ? `<form class="spot-addr-form hidden mt-2.5 flex items-center gap-2" data-spot-key="${item.editableAddressKey}">
+                        <input
+                          type="text"
+                          value="${escapeHtml(customAddr)}"
+                          placeholder="輸入訂位的 Pizza 4P's 分店地址..."
+                          class="flex-1 px-3 py-1.5 rounded-xl bg-cream border border-coffee/25 text-xs text-coffee focus:outline-none focus:border-ocean"
+                        />
+                        <button type="submit" class="px-3 py-1.5 rounded-xl bg-coconut text-white border border-coffee/20 text-xs font-bold shrink-0">
+                          儲存
+                        </button>
+                      </form>`
+                    : ''
+                }
+              `
+              : '';
+
+            return `
+              <div class="relative pl-8 ${isLast ? '' : 'pb-5'}">
+                <!-- 左側垂直連接線 -->
+                ${!isLast ? '<span class="absolute left-[11px] top-6 bottom-0 w-[2px] bg-coffee/20 rounded-full"></span>' : ''}
+                <!-- 時間軸圓點 -->
+                <span class="absolute left-0 top-1.5 w-6 h-6 rounded-full ${item.mustGo ? 'bg-dragonfruit' : 'bg-mango'} border-2 border-coffee flex items-center justify-center text-[10px] font-bold text-white">
+                  ${idx + 1}
+                </span>
+
+                <!-- 行程卡片 -->
+                <article class="illust-card p-4">
+                  <div class="flex items-start justify-between gap-2">
+                    <div class="space-y-1.5">
+                      <!-- 時間與標籤列 -->
+                      <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="px-2.5 py-0.5 rounded-full bg-cream border border-coffee/20 font-display font-bold text-xs text-coffee">
+                          ⏰ ${item.time}
+                        </span>
+                        ${
+                          item.mustGo
+                            ? '<span class="px-2.5 py-0.5 rounded-full bg-dragonfruit text-white border border-coffee/20 text-xs font-bold tracking-wide">★ 必去</span>'
+                            : ''
+                        }
+                        ${
+                          item.reserved
+                            ? '<span class="px-2.5 py-0.5 rounded-full bg-coconut text-white border border-coffee/20 text-xs font-bold tracking-wide">✓ 已訂位</span>'
+                            : ''
+                        }
+                        <span class="px-2.5 py-0.5 rounded-full ${item.transport.color} border border-coffee/15 text-xs font-medium text-coffee">
+                          ${item.transport.label}
+                        </span>
+                      </div>
+
+                      <!-- 景點標題 -->
+                      <h3 class="font-display font-black text-base sm:text-lg text-coffee leading-snug pt-0.5">
+                        ${item.title}
+                      </h3>
+                    </div>
+
+                    <!-- 小插畫徽章 -->
+                    <div class="w-10 h-10 rounded-2xl bg-cream border border-coffee/15 flex items-center justify-center shrink-0">
+                      ${getSpotSvg(item.icon)}
+                    </div>
+                  </div>
+
+                  <!-- 營業時間、地址與備註 -->
+                  <div class="mt-2.5 space-y-1.5 text-xs sm:text-sm text-coffee/85 leading-relaxed">
+                    ${
+                      item.hours
+                        ? `<p class="flex items-start gap-1.5 text-coffee/75"><span class="shrink-0">🕒</span><span><strong>營業時間：</strong>${item.hours}</span></p>`
+                        : ''
+                    }
+                    ${addressDisplayHtml}
+                    ${
+                      item.note
+                        ? `<p class="flex items-start gap-1.5"><span class="shrink-0">📝</span><span>${item.note}</span></p>`
+                        : ''
+                    }
+                  </div>
+
+                  ${recommendationsHtml}
+                  ${actionButtonsHtml}
+                </article>
+              </div>
+            `;
+          })
+          .join('');
+
+        timelineContainer.innerHTML = `
+          <div class="p-3.5 rounded-2xl ${data.accentColor}/20 border border-coffee/15 mb-4">
+            <h3 class="font-display font-black text-base sm:text-lg text-coffee">${data.dayTitle}</h3>
+            <p class="text-xs sm:text-sm text-coffee/80 mt-1">${data.summary}</p>
+          </div>
+          <div>${itemsHtml}</div>
+        `;
+
+        // 觸發彈跳過渡動畫
+        if (animate) {
+          timelineContainer.classList.remove('animate-tab-bounce');
+          void timelineContainer.offsetWidth;
+          timelineContainer.classList.add('animate-tab-bounce');
+        }
+      }
+
+      // ==========================================
+      // 3. 出發倒數計時器 (目標時間: 2026-12-04 14:00 GMT+8)
+      // ==========================================
+      const DEPARTURE_TIME = new Date('2026-12-04T14:00:00+08:00').getTime();
+
+      function updateCountdown() {
+        const now = Date.now();
+        const diff = DEPARTURE_TIME - now;
+
+        const daysEl = document.getElementById('cd-days');
+        const hoursEl = document.getElementById('cd-hours');
+        const minsEl = document.getElementById('cd-mins');
+        const secsEl = document.getElementById('cd-secs');
+        const subtextEl = document.getElementById('countdownSubtext');
+        if (!daysEl || !hoursEl || !minsEl || !secsEl || !subtextEl) return;
+
+        if (diff <= 0) {
+          daysEl.textContent = '00';
+          hoursEl.textContent = '00';
+          minsEl.textContent = '00';
+          secsEl.textContent = '00';
+          subtextEl.textContent = '🎉 旅程已經展開！祝在胡志明市玩得開心！';
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const mins = Math.floor((diff / (1000 * 60)) % 60);
+        const secs = Math.floor((diff / 1000) % 60);
+
+        daysEl.textContent = String(days).padStart(2, '0');
+        hoursEl.textContent = String(hours).padStart(2, '0');
+        minsEl.textContent = String(mins).padStart(2, '0');
+        secsEl.textContent = String(secs).padStart(2, '0');
+      }
+
+      // ==========================================
+      // 4. 住宿資訊編輯與一鍵複製 (支援 localStorage)
+      // ==========================================
+      const HOTEL_STORAGE_KEY = 'sgn_2026_hotel_info_v2';
+      const defaultHotel = {
+        name: 'G8 Center Hotel Sài Gòn',
+        address: '157-157A Pasteur, Xuân Hòa, Hồ Chí Minh 700000, Vietnam',
+        phone: '+84 28 3936 2101',
+        checkIn: '12/04 (五) 15:00 後',
+        checkOut: '12/06 (日) 12:00 前'
+      };
+
+      let hotelData = defaultHotel;
+      try {
+        const savedHotel = localStorage.getItem(HOTEL_STORAGE_KEY);
+        if (savedHotel) hotelData = { ...defaultHotel, ...JSON.parse(savedHotel) };
+      } catch (e) {}
+
+      function syncHotelUI() {
+        document.getElementById('hotelNameDisplay').textContent = hotelData.name;
+        document.getElementById('hotelAddressDisplay').textContent = `📍 ${hotelData.address}`;
+        const phoneEl = document.getElementById('hotelPhoneDisplay');
+        phoneEl.textContent = hotelData.phone;
+        phoneEl.href = `tel:${hotelData.phone.replace(/[^+\d]/g, '')}`;
+        document.getElementById('hotelCheckInDisplay').textContent = hotelData.checkIn;
+        document.getElementById('hotelCheckOutDisplay').textContent = hotelData.checkOut;
+        document.getElementById('openHotelMapLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotelData.name + ' ' + hotelData.address)}`;
+      }
+
+      // ==========================================
+      // 5. 可打勾清單系統 (待辦清單、出發前清單、行李清單)
+      // ==========================================
+      const CHECKLIST_STORAGE_KEY = 'sgn_2026_checklists_v1';
+      const DEFAULT_CHECKLISTS = [
+        {
+          id: 'todo',
+          title: '旅行待辦清單',
+          subtitle: '行前預約與當地 App 準備',
+          badgeColor: 'bg-mango',
+          icon: '📝',
+          items: [
+            { id: 't1', text: "線上預約 Day 2 午餐：Pizza 4P's 披薩", checked: false },
+            { id: 't2', text: '預約 Day 1 越式洗髮 & Day 3 全身按摩時段', checked: false },
+            { id: 't3', text: '下載 Grab App 並完成台灣信用卡綁定與簡訊驗證', checked: false },
+            { id: 't4', text: '購買越南網卡 / eSIM 並確認開通方式', checked: false },
+            { id: 't5', text: '兌換美金大鈔（準備至越南銀樓換越南盾 VND）', checked: false }
+          ]
+        },
+        {
+          id: 'predeparture',
+          title: '出發前清單',
+          subtitle: '證件文件與重要憑證檢查',
+          badgeColor: 'bg-dragonfruit',
+          icon: '🛂',
+          items: [
+            { id: 'p1', text: '確認護照有效期限（需 6 個月以上）', checked: false },
+            { id: 'p2', text: '申請並「列印紙本」越南電子簽證 (E-Visa)', checked: false },
+            { id: 'p3', text: '列印星宇航空電子機票（JX713 / JX714）與住宿憑證', checked: false },
+            { id: 'p4', text: '投保海外旅遊平安險與班機延誤不便險', checked: false },
+            { id: 'p5', text: '出發前 48 小時完成星宇航空網路預辦登機', checked: false }
+          ]
+        },
+        {
+          id: 'packing',
+          title: '行李清單',
+          subtitle: '12月胡志明市（約 24°C–32°C 晴朗微熱）穿搭與必備品',
+          badgeColor: 'bg-coconut',
+          icon: '🧳',
+          items: [
+            { id: 'k1', text: '透氣夏季衣物 3 套 ＋ 薄長袖外套（機上與冷氣房用）', checked: false },
+            { id: 'k2', text: '好走的休閒鞋或涼鞋（Day 2 市區漫步必備）', checked: false },
+            { id: 'k3', text: '太陽眼鏡、防曬乳、晴雨兩用摺疊傘', checked: false },
+            { id: 'k4', text: '個人常備藥品（腸胃藥、止痛藥、防蚊液、OK繃）', checked: false },
+            { id: 'k5', text: '行動電源（隨身攜帶勿託運）、充電線與轉接頭（越南雙圓/雙扁孔通用）', checked: false },
+            { id: 'k6', text: '大型摺疊購物袋（裝哈利波特牙膏與超市伴手禮！）', checked: false }
+          ]
+        }
+      ];
+
+      let checklistsState = DEFAULT_CHECKLISTS;
+      try {
+        const savedLists = localStorage.getItem(CHECKLIST_STORAGE_KEY);
+        if (savedLists) checklistsState = JSON.parse(savedLists);
+      } catch (e) {}
+
+      function saveChecklists() {
+        try {
+          localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(checklistsState));
+        } catch (e) {}
+      }
+
+      function renderChecklists() {
+        const checklistsContainer = document.getElementById('checklistsContainer');
+        if (!checklistsContainer) return;
+
+        checklistsContainer.innerHTML = checklistsState
+          .map((list) => {
+            const total = list.items.length;
+            const done = list.items.filter((i) => i.checked).length;
+            const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+
+            const itemsHtml = list.items
+              .map(
+                (item) => `
+                <li class="group flex items-center justify-between gap-2.5 py-2 border-b border-coffee/10 last:border-b-0">
+                  <label class="flex items-start gap-3 cursor-pointer flex-1 select-none">
+                    <input
+                      type="checkbox"
+                      class="custom-checkbox mt-0.5"
+                      data-list-id="${list.id}"
+                      data-item-id="${item.id}"
+                      ${item.checked ? 'checked' : ''}
+                    />
+                    <span class="text-sm leading-snug transition-colors ${
+                      item.checked ? 'line-through text-coffee/45' : 'text-coffee font-medium'
+                    }">
+                      ${escapeHtml(item.text)}
+                    </span>
+                  </label>
+                  <button
+                    type="button"
+                    title="刪除此項目"
+                    aria-label="刪除此項目"
+                    data-delete-list="${list.id}"
+                    data-delete-item="${item.id}"
+                    class="opacity-60 hover:opacity-100 text-xs text-coffee/60 hover:text-dragonfruit px-1.5 py-0.5 rounded transition-opacity"
+                  >
+                    ✕
+                  </button>
+                </li>
+              `
+              )
+              .join('');
+
+            return `
+              <div class="illust-card p-4 sm:p-5">
+                <!-- 清單標題與完成度 -->
+                <div class="flex items-start justify-between gap-2 mb-2">
+                  <div class="flex items-center gap-2.5">
+                    <span class="inline-flex items-center justify-center w-9 h-9 rounded-2xl ${list.badgeColor}/30 border border-coffee/20 text-lg">
+                      ${list.icon}
+                    </span>
+                    <div>
+                      <h3 class="font-display font-black text-lg text-coffee">${list.title}</h3>
+                      <p class="text-xs text-coffee/70">${list.subtitle}</p>
+                    </div>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-full bg-cream border border-coffee/20 font-display font-bold text-xs text-coffee shrink-0">
+                    ${done} / ${total}
+                  </span>
+                </div>
+
+                <!-- 進度條 -->
+                <div class="w-full h-2 rounded-full bg-creamDark overflow-hidden mb-3 border border-coffee/10">
+                  <div class="h-full ${list.badgeColor} transition-all duration-300" style="width: ${percent}%"></div>
+                </div>
+
+                <!-- 勾選列表 -->
+                <ul class="divide-y divide-coffee/5 mb-3">
+                  ${itemsHtml || '<li class="py-3 text-center text-xs text-coffee/50">目前沒有項目，在下方新增一個吧！</li>'}
+                </ul>
+
+                <!-- 新增自訂項目輸入框 -->
+                <form class="add-item-form flex items-center gap-2" data-list-id="${list.id}">
+                  <input
+                    type="text"
+                    placeholder="新增項目..."
+                    class="flex-1 px-3 py-2 rounded-xl bg-cream border border-coffee/20 text-xs sm:text-sm text-coffee placeholder:text-coffee/45 focus:outline-none focus:border-coffee/50"
+                  />
+                  <button
+                    type="submit"
+                    class="btn-bounce px-3.5 py-2 rounded-xl ${list.badgeColor}/40 border border-coffee/25 text-xs font-bold text-coffee hover:${list.badgeColor}/60 transition-colors shrink-0"
+                  >
+                    ＋ 新增
+                  </button>
+                </form>
+              </div>
+            `;
+          })
+          .join('');
+      }
+
+      // ==========================================
+      // 6. 工具函式與事件綁定
+      // ==========================================
+      let toastTimer = null;
+      function showToast(msg) {
+        const toast = document.getElementById('toastMessage');
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.classList.remove('opacity-0');
+        toast.classList.add('opacity-100');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.remove('opacity-100');
+          toast.classList.add('opacity-0');
+        }, 2200);
+      }
+
+      function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      function initApp() {
+        const timelineContainer = getTimelineContainer();
+        const checklistsContainer = document.getElementById('checklistsContainer');
+        const hotelViewMode = document.getElementById('hotelViewMode');
+        const hotelEditForm = document.getElementById('hotelEditForm');
+        const toggleEditHotelBtn = document.getElementById('toggleEditHotelBtn');
+        const cancelHotelEditBtn = document.getElementById('cancelHotelEditBtn');
+        const motionToggleBtn = document.getElementById('motionToggleBtn');
+
+        // 動態效果初始化與切換
+        let isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        function applyMotionPreference() {
+          if (isReducedMotion) {
+            document.body.classList.add('reduce-motion');
+            if (motionToggleBtn) motionToggleBtn.textContent = '⏸️ 靜態';
+          } else {
+            document.body.classList.remove('reduce-motion');
+            if (motionToggleBtn) motionToggleBtn.textContent = '✨ 動態';
           }
         }
-      }
-    });
+        applyMotionPreference();
 
-    checklistsContainer.addEventListener('click', (e) => {
-      const delBtn = e.target.closest('[data-delete-item]');
-      if (delBtn) {
-        const listId = delBtn.dataset.deleteList;
-        const itemId = delBtn.dataset.deleteItem;
-        const targetList = checklistsState.find((l) => l.id === listId);
-        if (targetList) {
-          targetList.items = targetList.items.filter((i) => i.id !== itemId);
-          saveChecklists();
-          renderChecklists();
-          showToast('🗑️ 已移除該項目');
-        }
-      }
-    });
-
-    checklistsContainer.addEventListener('submit', (e) => {
-      if (e.target.matches('.add-item-form')) {
-        e.preventDefault();
-        const listId = e.target.dataset.listId;
-        const input = e.target.querySelector('input');
-        const text = input.value.trim();
-        if (!text) return;
-
-        const targetList = checklistsState.find((l) => l.id === listId);
-        if (targetList) {
-          targetList.items.push({
-            id: 'custom_' + Date.now(),
-            text,
-            checked: false
+        if (motionToggleBtn) {
+          motionToggleBtn.addEventListener('click', () => {
+            isReducedMotion = !isReducedMotion;
+            applyMotionPreference();
+            showToast(isReducedMotion ? '已開啟「減少動態效果」模式' : '已開啟「南洋微風動畫」模式');
           });
-          saveChecklists();
-          renderChecklists();
-          showToast('✨ 已新增至清單');
         }
+
+        // 日期分頁按鈕事件
+        document.querySelectorAll('.day-tab').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            renderDayItinerary(btn.dataset.day, true);
+          });
+        });
+
+        // 委派監聽行程與 SPA 卡片內的複製地址與補填地址事件
+        document.addEventListener('click', (e) => {
+          const copyBtn = e.target.closest('.copy-spot-btn');
+          if (copyBtn) {
+            copyTextToClipboard(copyBtn.dataset.copyText, '📋 已複製地址給 Grab 司機！');
+            return;
+          }
+
+          const editAddrBtn = e.target.closest('.edit-spot-addr-btn');
+          if (editAddrBtn && timelineContainer) {
+            const key = editAddrBtn.dataset.editSpotAddr;
+            const form = timelineContainer.querySelector(`.spot-addr-form[data-spot-key="${key}"]`);
+            if (form) {
+              form.classList.toggle('hidden');
+              const input = form.querySelector('input');
+              if (!form.classList.contains('hidden') && input) input.focus();
+            }
+          }
+        });
+
+        if (timelineContainer) {
+          timelineContainer.addEventListener('submit', (e) => {
+            if (e.target.matches('.spot-addr-form')) {
+              e.preventDefault();
+              const key = e.target.dataset.spotKey;
+              const input = e.target.querySelector('input');
+              customSpotAddresses[key] = input.value.trim();
+              try {
+                localStorage.setItem(CUSTOM_SPOT_ADDR_KEY, JSON.stringify(customSpotAddresses));
+              } catch (err) {}
+              renderDayItinerary(currentTabKey, false);
+              showToast('✅ 已儲存餐廳地址！');
+            }
+          });
+        }
+
+        // 住宿編輯事件
+        if (toggleEditHotelBtn) {
+          toggleEditHotelBtn.addEventListener('click', () => {
+            document.getElementById('hotelNameInput').value = hotelData.name;
+            document.getElementById('hotelAddressInput').value = hotelData.address;
+            document.getElementById('hotelPhoneInput').value = hotelData.phone;
+            document.getElementById('hotelCheckInInput').value = hotelData.checkIn;
+            document.getElementById('hotelCheckOutInput').value = hotelData.checkOut;
+            hotelViewMode.classList.add('hidden');
+            hotelEditForm.classList.remove('hidden');
+          });
+        }
+
+        if (cancelHotelEditBtn) {
+          cancelHotelEditBtn.addEventListener('click', () => {
+            hotelEditForm.classList.add('hidden');
+            hotelViewMode.classList.remove('hidden');
+          });
+        }
+
+        if (hotelEditForm) {
+          hotelEditForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            hotelData = {
+              name: document.getElementById('hotelNameInput').value.trim() || defaultHotel.name,
+              address: document.getElementById('hotelAddressInput').value.trim() || defaultHotel.address,
+              phone: document.getElementById('hotelPhoneInput').value.trim() || defaultHotel.phone,
+              checkIn: document.getElementById('hotelCheckInInput').value.trim() || defaultHotel.checkIn,
+              checkOut: document.getElementById('hotelCheckOutInput').value.trim() || defaultHotel.checkOut
+            };
+            try {
+              localStorage.setItem(HOTEL_STORAGE_KEY, JSON.stringify(hotelData));
+            } catch (err) {}
+            syncHotelUI();
+            hotelEditForm.classList.add('hidden');
+            hotelViewMode.classList.remove('hidden');
+            showToast('✅ 已更新住宿資訊！');
+          });
+        }
+
+        const copyHotelAddrBtn = document.getElementById('copyHotelAddrBtn');
+        if (copyHotelAddrBtn) {
+          copyHotelAddrBtn.addEventListener('click', () => {
+            copyTextToClipboard(`${hotelData.name} - ${hotelData.address}`, '📋 已複製飯店名稱與地址！');
+          });
+        }
+
+        // 清單事件
+        if (checklistsContainer) {
+          checklistsContainer.addEventListener('change', (e) => {
+            if (e.target.matches('input[type="checkbox"]')) {
+              const listId = e.target.dataset.listId;
+              const itemId = e.target.dataset.itemId;
+              const targetList = checklistsState.find((l) => l.id === listId);
+              if (targetList) {
+                const targetItem = targetList.items.find((i) => i.id === itemId);
+                if (targetItem) {
+                  targetItem.checked = e.target.checked;
+                  saveChecklists();
+                  renderChecklists();
+                }
+              }
+            }
+          });
+
+          checklistsContainer.addEventListener('click', (e) => {
+            const delBtn = e.target.closest('[data-delete-item]');
+            if (delBtn) {
+              const listId = delBtn.dataset.deleteList;
+              const itemId = delBtn.dataset.deleteItem;
+              const targetList = checklistsState.find((l) => l.id === listId);
+              if (targetList) {
+                targetList.items = targetList.items.filter((i) => i.id !== itemId);
+                saveChecklists();
+                renderChecklists();
+                showToast('🗑️ 已移除該項目');
+              }
+            }
+          });
+
+          checklistsContainer.addEventListener('submit', (e) => {
+            if (e.target.matches('.add-item-form')) {
+              e.preventDefault();
+              const listId = e.target.dataset.listId;
+              const input = e.target.querySelector('input');
+              const text = input.value.trim();
+              if (!text) return;
+
+              const targetList = checklistsState.find((l) => l.id === listId);
+              if (targetList) {
+                targetList.items.push({
+                  id: 'custom_' + Date.now(),
+                  text,
+                  checked: false
+                });
+                saveChecklists();
+                renderChecklists();
+                showToast('✨ 已新增至清單');
+              }
+            }
+          });
+        }
+
+        // 首次畫面渲染
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        renderDayItinerary(1, false);
+        renderSpaSection();
+        syncHotelUI();
+        renderChecklists();
       }
-    });
 
-    // ==========================================
-    // 6. 減少動態效果切換按鈕與工具函式
-    // ==========================================
-    const motionToggleBtn = document.getElementById('motionToggleBtn');
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let isReducedMotion = prefersReduced;
-
-    function applyMotionPreference() {
-      if (isReducedMotion) {
-        document.body.classList.add('reduce-motion');
-        motionToggleBtn.textContent = '⏸️ 靜態';
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
       } else {
-        document.body.classList.remove('reduce-motion');
-        motionToggleBtn.textContent = '✨ 動態';
+        initApp();
       }
-    }
-
-    motionToggleBtn.addEventListener('click', () => {
-      isReducedMotion = !isReducedMotion;
-      applyMotionPreference();
-      showToast(isReducedMotion ? '已開啟「減少動態效果」模式' : '已開啟「南洋微風動畫」模式');
-    });
-
-    let toastTimer = null;
-    function showToast(msg) {
-      const toast = document.getElementById('toastMessage');
-      toast.textContent = msg;
-      toast.classList.remove('opacity-0');
-      toast.classList.add('opacity-100');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        toast.classList.remove('opacity-100');
-        toast.classList.add('opacity-0');
-      }, 2200);
-    }
-
-    function escapeHtml(str) {
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
-    // 初始化所有區塊
-    window.addEventListener('DOMContentLoaded', () => {
-      applyMotionPreference();
-      updateCountdown();
-      setInterval(updateCountdown, 1000);
-      renderDayItinerary(1, false);
-      syncHotelUI();
-      renderChecklists();
-    });
+    })();
   </script>
 </body>
 </html>
